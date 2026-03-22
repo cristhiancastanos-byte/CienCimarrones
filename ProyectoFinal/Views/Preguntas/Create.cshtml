@@ -1,0 +1,80 @@
+﻿@model ProyectoFinal.Models.Pregunta
+
+@{
+    ViewData["Title"] = "Nueva Pregunta";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3>Alta de Pregunta - 100 Mexicanos Dijeron</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">¿Cuál es la pregunta?</label>
+                            <input asp-for="Titulo" class="form-control form-control-lg" placeholder="Ej: ¿Qué llevas a una isla desierta?" />
+                            <span asp-validation-for="Titulo" class="text-danger"></span>
+                        </div>
+
+                        <hr />
+                        <h5 class="mb-3 text-secondary">Respuestas Populares y Puntos</h5>
+
+                        <div class="row mb-2">
+                            <div class="col-8">
+                                <input asp-for="Respuesta1" class="form-control" placeholder="Respuesta #1 (La más popular)" />
+                            </div>
+                            <div class="col-4">
+                                <input asp-for="Puntos1" class="form-control" placeholder="Puntos" type="number" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-8">
+                                <input asp-for="Respuesta2" class="form-control" placeholder="Respuesta #2" />
+                            </div>
+                            <div class="col-4">
+                                <input asp-for="Puntos2" class="form-control" placeholder="Puntos" type="number" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-8">
+                                <input asp-for="Respuesta3" class="form-control" placeholder="Respuesta #3" />
+                            </div>
+                            <div class="col-4">
+                                <input asp-for="Puntos3" class="form-control" placeholder="Puntos" type="number" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-8">
+                                <input asp-for="Respuesta4" class="form-control" placeholder="Respuesta #4" />
+                            </div>
+                            <div class="col-4">
+                                <input asp-for="Puntos4" class="form-control" placeholder="Puntos" type="number" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-8">
+                                <input asp-for="Respuesta5" class="form-control" placeholder="Respuesta #5" />
+                            </div>
+                            <div class="col-4">
+                                <input asp-for="Puntos5" class="form-control" placeholder="Puntos" type="number" />
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">Guardar Pregunta</button>
+                            <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

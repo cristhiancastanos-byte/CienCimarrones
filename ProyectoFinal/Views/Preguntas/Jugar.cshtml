@@ -1,0 +1,634 @@
+﻿@model ProyectoFinal.Models.Pregunta
+@using Microsoft.AspNetCore.Http
+
+@{
+    ViewData["Title"] = "En Vivo - 100 Cimarrones Dijeron";
+    // Detectamos el rol desde la sesión
+    var rol = Context.Session.GetString("Rol");
+}
+
+<style>
+    body {
+        background-color: #ffffff;
+        color: #333333;
+        overflow-x: hidden;
+        font-family: 'Arial', sans-serif;
+    }
+
+    .header-controles {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 80px;
+        margin-bottom: 1rem;
+        padding: 0 15px;
+    }
+
+    .btn-volver-container {
+        position: absolute;
+        left: 0;
+    }
+
+    .tablero {
+        background-color: #f8f9fa;
+        border: 5px solid #00723F;
+        border-radius: 15px;
+        padding: 15px;
+        position: relative;
+        z-index: 10;
+        box-shadow: 0 10px 30px rgba(0, 114, 63, 0.15);
+    }
+
+    .pregunta-box {
+        background-color: #00723F;
+        color: #ffffff;
+        border: 3px solid #FEBE10;
+        border-radius: 10px;
+        padding: 10px;
+        text-align: center;
+        margin-bottom: 15px;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .respuesta-card {
+        background-color: #ffffff;
+        border: 2px solid #20419A;
+        border-radius: 5px;
+        margin-bottom: 8px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.1s, box-shadow 0.2s;
+    }
+
+    .respuesta-texto {
+        display: none;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 15px;
+        font-weight: bold;
+        font-size: 1.2rem;
+        color: #024731;
+        height: 100%;
+        align-items: center;
+    }
+
+    .tapa {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, #FEBE10, #DD971A);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Arial Black', sans-serif;
+        font-size: 1.5rem;
+        color: #024731;
+        border: 1px solid #B08208;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .revelada .tapa {
+        display: none;
+    }
+
+    .revelada .respuesta-texto {
+        display: flex;
+    }
+
+    .revelada {
+        pointer-events: none;
+        border-color: #00723F;
+    }
+
+    .panel-equipo {
+        border: 3px solid #20419A;
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        transition: all 0.3s;
+        opacity: 0.6;
+        cursor: pointer;
+        background-color: #ffffff;
+    }
+
+    .equipo-activo {
+        border-color: #00723F;
+        background-color: #f0fdf4;
+        opacity: 1;
+        transform: scale(1.02);
+    }
+
+    .ganador-ronda {
+        border-color: #FEBE10 !important;
+        background-color: #fffcf0;
+        transform: scale(1.1);
+        opacity: 1;
+    }
+
+    .marcador-puntos {
+        font-size: 4rem;
+        font-weight: bold;
+        color: #00723F;
+        text-shadow: 2px 2px 0px #FEBE10;
+    }
+
+    .zona-errores {
+        font-size: 3rem;
+        color: #dc3545;
+        min-height: 60px;
+        letter-spacing: 10px;
+    }
+
+    .timer-container {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 10px;
+    }
+
+    .timer-svg {
+        transform: rotate(-90deg);
+        width: 80px;
+        height: 80px;
+    }
+
+    .timer-circle-bg {
+        fill: none;
+        stroke: #eee;
+        stroke-width: 8;
+    }
+
+    .timer-circle-prog {
+        fill: none;
+        stroke: #00723F;
+        stroke-width: 8;
+        stroke-dasharray: 226;
+        stroke-dashoffset: 0;
+        transition: stroke-dashoffset 1s linear, stroke 0.3s;
+    }
+
+    .timer-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+    #overlay-error {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255,255,255,0.85);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9998;
+    }
+
+    .x-gigante {
+        font-size: 25rem;
+        color: #dc3545;
+        font-family: 'Arial Black', sans-serif;
+        animation: vibrar 0.3s infinite;
+    }
+
+    @@keyframes vibrar {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        25% {
+            transform: rotate(5deg);
+        }
+
+        75% {
+            transform: rotate(-5deg);
+        }
+
+        100% {
+            transform: rotate(0deg);
+        }
+    }
+
+    @@keyframes blink {
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.4;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+    #modal-juego {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .caja-mensaje {
+        background: #ffffff;
+        border: 5px solid #00723F;
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        max-width: 600px;
+        width: 90%;
+    }
+
+    .btn-modal {
+        padding: 10px 30px;
+        font-size: 1.2rem;
+        border-radius: 10px;
+        border: none;
+        font-weight: bold;
+        margin: 0 10px;
+        cursor: pointer;
+    }
+
+    .btn-ok {
+        background-color: #00723F;
+        color: white;
+    }
+
+    .btn-cancel {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-audio-toggle {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #00723F;
+        color: white;
+        border: 2px solid #FEBE10;
+        font-size: 1.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+<audio id="snd-acierto" src="~/audio/acierto.mp3"></audio>
+<audio id="snd-error" src="~/audio/error.mp3"></audio>
+<audio id="snd-reloj" src="~/audio/reloj.mp3"></audio>
+
+<button onclick="toggleMute()" class="btn-audio-toggle shadow" id="mute-btn">🔊</button>
+
+<div id="overlay-error"><div class="x-gigante">❌</div></div>
+
+<div id="modal-juego">
+    <div class="caja-mensaje">
+        <div id="modal-titulo" class="h2 fw-bold text-uppercase" style="color: #20419A;">ATENCIÓN</div>
+        <div id="modal-texto" class="fs-4 mb-4">...</div>
+        <div id="modal-botones"></div>
+    </div>
+</div>
+
+<div class="container-fluid mt-3">
+    <div class="header-controles">
+        <div class="btn-volver-container">
+            @* Lógica de Botones Inteligente *@
+            @if (rol == "Admin")
+            {
+                <button onclick="confirmarSalida()" class="btn fw-bold shadow-sm"
+                        style="background-color: #00723F; color: white; border-radius: 8px; border: 2px solid #024731; padding: 10px 25px;">
+                    ⬅ Volver al Menú
+                </button>
+            }
+            else
+            {
+                <button onclick="confirmarLogout()" class="btn btn-danger fw-bold shadow-sm"
+                        style="border-radius: 8px; border: 2px solid #a71d2a; padding: 10px 25px;">
+                    🚪 Cerrar Sesión
+                </button>
+            }
+        </div>
+
+        <div class="d-flex gap-3">
+            <button onclick="confirmarNuevoJuego()" class="btn btn-danger fw-bold shadow-sm" style="border-radius: 8px; padding: 10px 20px;">
+                ⚠️ Reiniciar Marcadores
+            </button>
+            <a asp-controller="Preguntas" asp-action="SiguienteAleatoria" class="btn fw-bold shadow-sm"
+               style="background-color: #FEBE10; color: #024731; border-radius: 8px; border: 2px solid #B08208; padding: 10px 25px; text-decoration: none;">
+                🔄 Siguiente Pregunta ➡
+            </a>
+        </div>
+    </div>
+
+    <div class="row align-items-center">
+        <div class="col-md-3 text-center">
+            <div id="panel-eq1" class="panel-equipo equipo-activo" onclick="seleccionarEquipo(1)">
+                <h3 style="color: #20419A; font-weight: 900;">EQUIPO 1</h3>
+                <div class="marcador-puntos" id="puntos-eq1">0</div>
+                <div class="zona-errores" id="errores-eq1"></div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="tablero">
+                <div class="timer-container">
+                    <svg class="timer-svg">
+                        <circle class="timer-circle-bg" cx="40" cy="40" r="36"></circle>
+                        <circle id="timer-prog" class="timer-circle-prog" cx="40" cy="40" r="36"></circle>
+                    </svg>
+                    <div id="timer-count" class="timer-text">15</div>
+                </div>
+
+                <div class="pregunta-box">
+                    <h3 class="text-uppercase m-0 fw-bold">@Model.Titulo</h3>
+                </div>
+
+                <div class="text-center mb-3">
+                    <span class="badge p-2 fs-6 border border-dark" style="background-color: #20419A; color: white;">
+                        BOTE: <span id="bote-puntos" style="color: #FEBE10;" class="fw-bold fs-4">0</span>
+                    </span>
+                    <div id="aviso-robo" class="badge bg-danger p-2 fs-6 ms-2" style="display:none; animation: blink 1s infinite;">🚨 ROBO</div>
+                </div>
+
+                @for (int i = 1; i <= 5; i++)
+                {
+                    string respuesta = (string)Model.GetType().GetProperty($"Respuesta{i}").GetValue(Model, null);
+                    int? puntos = (int?)Model.GetType().GetProperty($"Puntos{i}").GetValue(Model, null);
+
+                    if (!string.IsNullOrEmpty(respuesta))
+                    {
+                        <div class="respuesta-card shadow-sm" id="card-@i" onclick="forzarRevelacion(@i)">
+                            <div class="tapa">@i</div>
+                            <div class="respuesta-texto">
+                                <span id="texto-@i">@respuesta</span>
+                                <span class="badge text-dark puntos-val" style="background-color: #FEBE10; border: 1px solid #000;">@puntos</span>
+                            </div>
+                        </div>
+                    }
+                }
+
+                <div class="input-group input-group-lg mt-4 shadow-sm">
+                    <input type="text" id="inputRespuesta" class="form-control text-center fw-bold" placeholder="Escribe la respuesta..." autocomplete="off" style="border: 2px solid #00723F;">
+                    <button class="btn fw-bold text-white px-4" type="button" onclick="verificarRespuesta()" style="background-color: #00723F;">¡DICE!</button>
+                    <button class="btn btn-danger fw-bold" type="button" onclick="manejarError()">❌</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 text-center">
+            <div id="panel-eq2" class="panel-equipo" onclick="seleccionarEquipo(2)">
+                <h3 style="color: #20419A; font-weight: 900;">EQUIPO 2</h3>
+                <div class="marcador-puntos" id="puntos-eq2">0</div>
+                <div class="zona-errores" id="errores-eq2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var equipoActual = 1; var equipoOriginal = 1;
+    var botePuntos = 0; var erroresActuales = 0;
+    var modoRobo = false; var rondaTerminada = false;
+    var callbackActual = null;
+    var estaMuteado = false;
+
+    var tiempoMax = 15;
+    var tiempoRestante = tiempoMax;
+    var timerInterval = null;
+
+    function playSound(id) {
+        if (estaMuteado) return;
+        const sound = document.getElementById(id);
+        if (sound) { sound.currentTime = 0; sound.play().catch(e => {}); }
+    }
+
+    function toggleMute() {
+        estaMuteado = !estaMuteado;
+        document.getElementById("mute-btn").innerText = estaMuteado ? "🔇" : "🔊";
+    }
+
+    function startTimer(reset = false) {
+        clearInterval(timerInterval);
+        if (reset) {
+            tiempoRestante = tiempoMax;
+            const audioReloj = document.getElementById("snd-reloj");
+            if(audioReloj) { audioReloj.pause(); audioReloj.currentTime = 0; }
+        }
+
+        actualizarUIClock();
+
+        timerInterval = setInterval(() => {
+            if (rondaTerminada) { clearInterval(timerInterval); return; }
+
+            if (tiempoRestante === 5) {
+                playSound("snd-reloj");
+            }
+
+            tiempoRestante--;
+            actualizarUIClock();
+
+            if (tiempoRestante <= 0) {
+                clearInterval(timerInterval);
+                manejarError();
+            }
+        }, 1000);
+    }
+
+    function pausarReloj() {
+        clearInterval(timerInterval);
+        const audioReloj = document.getElementById("snd-reloj");
+        if(audioReloj) audioReloj.pause();
+    }
+
+    function actualizarUIClock() {
+        const textElem = document.getElementById("timer-count");
+        const circleElem = document.getElementById("timer-prog");
+        textElem.innerText = tiempoRestante;
+        const offset = 226 - (tiempoRestante * 226) / tiempoMax;
+        circleElem.style.strokeDashoffset = offset;
+
+        if (tiempoRestante > 7) circleElem.style.stroke = "#00723F";
+        else if (tiempoRestante > 3) circleElem.style.stroke = "#FEBE10";
+        else circleElem.style.stroke = "#dc3545";
+    }
+
+    function mostrarMensaje(titulo, texto, callback) {
+        pausarReloj();
+        document.getElementById("modal-titulo").innerText = titulo;
+        document.getElementById("modal-texto").innerHTML = texto.replace(/\n/g, "<br>");
+        document.getElementById("modal-botones").innerHTML = '<button class="btn-modal btn-ok" onclick="cerrarModal()">ENTENDIDO</button>';
+        callbackActual = callback;
+        document.getElementById("modal-juego").style.display = "flex";
+    }
+
+    function cerrarModal() {
+        document.getElementById("modal-juego").style.display = "none";
+        if (callbackActual) { callbackActual(); callbackActual = null; }
+        if (!rondaTerminada) startTimer(false);
+        document.getElementById("inputRespuesta").focus();
+    }
+
+    function mostrarConfirmacion(titulo, texto, callbackSi) {
+        pausarReloj();
+        document.getElementById("modal-titulo").innerText = titulo;
+        document.getElementById("modal-texto").innerText = texto;
+        document.getElementById("modal-botones").innerHTML = `
+            <button class="btn-modal btn-cancel" onclick="document.getElementById('modal-juego').style.display='none'; if(!rondaTerminada) startTimer(false);">CANCELAR</button>
+            <button class="btn-modal btn-ok" id="btn-confirmar">CONFIRMAR</button>
+        `;
+        document.getElementById("btn-confirmar").onclick = function() {
+            document.getElementById("modal-juego").style.display = "none";
+            callbackSi();
+        };
+        document.getElementById("modal-juego").style.display = "flex";
+    }
+
+    function confirmarSalida() {
+        mostrarConfirmacion("SALIR DEL JUEGO", "¿Seguro que quieres volver al panel de control?", function() {
+            window.location.href = '@Url.Action("Index", "Preguntas")';
+        });
+    }
+
+    function confirmarLogout() {
+        mostrarConfirmacion("CERRAR SESIÓN", "¿Estás seguro que quieres salir al inicio?", function() {
+            window.location.href = '@Url.Action("Logout", "Acceso")';
+        });
+    }
+
+    function confirmarNuevoJuego() {
+        mostrarConfirmacion("REINICIAR MARCADORES", "¿Borrar puntos de ambos equipos?", function() {
+            localStorage.clear(); location.reload();
+        });
+    }
+
+    window.onload = function() {
+        if(localStorage.getItem("puntosEq1")) document.getElementById("puntos-eq1").innerText = localStorage.getItem("puntosEq1");
+        if(localStorage.getItem("puntosEq2")) document.getElementById("puntos-eq2").innerText = localStorage.getItem("puntosEq2");
+        document.getElementById("inputRespuesta").focus();
+        startTimer(true);
+    };
+
+    function seleccionarEquipo(num) {
+        if (modoRobo || rondaTerminada) return;
+        equipoActual = num; equipoOriginal = num; erroresActuales = 0;
+        actualizarEstilosEquipos();
+        startTimer(true);
+    }
+
+    function actualizarEstilosEquipos() {
+        document.getElementById("panel-eq1").className = "panel-equipo" + (equipoActual==1?" equipo-activo":"");
+        document.getElementById("panel-eq2").className = "panel-equipo" + (equipoActual==2?" equipo-activo":"");
+    }
+
+    function normalizar(texto) {
+        return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+    }
+
+    function verificarRespuesta() {
+        if (rondaTerminada) return;
+        var input = document.getElementById("inputRespuesta");
+        var intento = normalizar(input.value);
+        if (intento === "") return;
+        var encontro = false;
+        for (var i = 1; i <= 5; i++) {
+            var card = document.getElementById("card-" + i);
+            if (card && !card.classList.contains("revelada")) {
+                var textoReal = normalizar(document.getElementById("texto-" + i).innerText);
+                if (textoReal === intento || (textoReal.includes(intento) && intento.length > 3)) {
+                    ejecutarAcierto(card); encontro = true;
+                }
+            }
+        }
+        if (!encontro) manejarError();
+        input.value = "";
+    }
+
+    function forzarRevelacion(indice) {
+        if (rondaTerminada) return;
+        var card = document.getElementById("card-" + indice);
+        if (card && !card.classList.contains("revelada")) ejecutarAcierto(card);
+    }
+
+    function ejecutarAcierto(card) {
+        card.classList.add("revelada");
+        playSound("snd-acierto");
+        var pts = parseInt(card.querySelector(".puntos-val").innerText);
+        botePuntos += pts;
+        document.getElementById("bote-puntos").innerText = botePuntos;
+
+        if (modoRobo) finalizarRonda(equipoActual);
+        else if (document.querySelectorAll(".respuesta-card:not(.revelada)").length === 0) finalizarRonda(equipoActual);
+        else startTimer(true);
+    }
+
+    function manejarError() {
+        pausarReloj();
+        playSound("snd-error");
+        var overlay = document.getElementById("overlay-error");
+        overlay.style.display = "flex";
+        setTimeout(function() { overlay.style.display = "none"; postError(); }, 1200);
+    }
+
+    function postError() {
+        if (modoRobo) {
+            mostrarMensaje("¡ROBO FALLIDO!", "Puntos para el equipo original.", function() { finalizarRonda(equipoOriginal); });
+        } else {
+            erroresActuales++;
+            document.getElementById("errores-eq" + equipoActual).innerHTML += "❌ ";
+            if (erroresActuales >= 3) {
+                mostrarMensaje("¡TRES TACHAS!", "Turno de robo.", function() {
+                    modoRobo = true;
+                    document.getElementById("aviso-robo").style.display = "inline-block";
+                    equipoActual = (equipoActual === 1) ? 2 : 1;
+                    actualizarEstilosEquipos();
+                    startTimer(true);
+                });
+            } else {
+                startTimer(true);
+            }
+        }
+    }
+
+    function finalizarRonda(ganador) {
+        rondaTerminada = true;
+        pausarReloj();
+        var total = parseInt(localStorage.getItem("puntosEq" + ganador) || 0) + botePuntos;
+        localStorage.setItem("puntosEq" + ganador, total);
+        document.getElementById("puntos-eq" + ganador).innerText = total;
+        document.getElementById("panel-eq" + ganador).classList.add("ganador-ronda");
+        document.querySelectorAll(".respuesta-card").forEach(c => c.classList.add("revelada"));
+        mostrarMensaje("FIN DE LA RONDA", "Puntos sumados al equipo " + ganador);
+    }
+
+    document.getElementById("inputRespuesta").addEventListener("keypress", function(e) { if (e.key === "Enter") verificarRespuesta(); });
+</script>

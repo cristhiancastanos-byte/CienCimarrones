@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - 100 Cimarrones Dijeron</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ProyectoFinal.styles.css" asp-append-version="true" />
+
+    <style>
+        body {
+            background-color: #f8f9fa; /* Fondo gris súper claro para que destaquen las tarjetas */
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Barra de Navegación */
+        .navbar-uabc {
+            background-color: #00723F !important; /* Verde UABC principal */
+            border-bottom: 4px solid #FEBE10 !important; /* Borde dorado */
+            box-shadow: 0 4px 10px rgba(0, 114, 63, 0.3);
+        }
+
+            .navbar-uabc .navbar-brand {
+                color: #FEBE10 !important; /* Nombre del proyecto en Dorado */
+                font-weight: 900;
+                font-size: 1.5rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                /* Se eliminó el centrado para mantenerlo a la izquierda y dejar espacio para futuros menús */
+            }
+
+        /* Pie de página (Footer) */
+        .footer-uabc {
+            background-color: #024731; /* Verde oscuro */
+            color: #ffffff;
+            border-top: 4px solid #FEBE10 !important;
+            padding: 15px 0;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* Ajuste para que el footer no tape el contenido */
+        html {
+            position: relative;
+            min-height: 100%;
+        }
+
+        body {
+            margin-bottom: 80px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-uabc mb-4">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">100 Cimarrones Dijeron</a>
+
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="footer-uabc text-muted">
+        <div class="container text-center text-white">
+            &copy; 2026 - 100 Cimarrones Dijeron
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

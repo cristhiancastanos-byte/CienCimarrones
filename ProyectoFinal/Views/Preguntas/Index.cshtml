@@ -1,0 +1,195 @@
+﻿@model IEnumerable<ProyectoFinal.Models.Pregunta>
+
+@{
+    ViewData["Title"] = "Panel de Control - Admin";
+}
+
+<style>
+    #modal-juego {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.6);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .caja-mensaje {
+        background: #ffffff;
+        border: 5px solid #00723F;
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .btn-modal {
+        padding: 10px 30px;
+        font-size: 1.1rem;
+        border-radius: 10px;
+        border: none;
+        font-weight: bold;
+        margin: 5px 10px;
+        cursor: pointer;
+        text-transform: uppercase;
+    }
+
+    .btn-ok {
+        background-color: #00723F;
+        color: white;
+    }
+
+    .btn-cancel {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    /* Estilos de la tabla y botones */
+    .table thead th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-group .btn {
+        padding: 0.4rem 0.8rem;
+    }
+
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .btn-primary {
+        background-color: #00723F;
+        border-color: #00723F;
+    }
+
+        .btn-primary:hover {
+            background-color: #005a32;
+            border-color: #005a32;
+        }
+</style>
+
+<div id="modal-juego">
+    <div class="caja-mensaje">
+        <div class="h2 fw-bold text-uppercase mb-3" style="color: #20419A;">¿Cerrar la sesión?</div>
+        <div class="fs-5 mb-4">¿Estás seguro de que deseas cerrar la sesión?</div>
+        <div id="modal-botones">
+            <button class="btn-modal btn-cancel" onclick="cerrarModal()">Cancelar</button>
+            <button class="btn-modal btn-ok" onclick="ejecutarLogout()">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h2 class="fw-bold" style="color: #00723F;">
+                <span class="badge bg-warning text-dark me-2">ADMIN</span>
+                Panel de 100 Cimarrones
+            </h2>
+        </div>
+        <div class="col-md-6 text-end">
+            <button onclick="abrirModal()" class="btn btn-outline-danger fw-bold me-2 shadow-sm">
+                🚪 Cerrar Sesión
+            </button>
+
+            <a asp-controller="Preguntas" asp-action="Create" class="btn btn-primary fw-bold shadow-sm">
+                + Nueva Pregunta
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="width: 80px;" class="text-center">ID</th>
+                            <th>Pregunta</th>
+                            <th>Respuesta Principal</th>
+                            <th style="width: 300px;" class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-center fw-bold text-muted">#@item.Id</td>
+                                <td class="fw-bold text-uppercase">@item.Titulo</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <span class="me-2 text-truncate" style="max-width: 150px;">@item.Respuesta1</span>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                            @item.Puntos1 pts
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group shadow-sm">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning fw-bold">
+                                            ✏️ Editar
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger fw-bold">
+                                            🗑️ Borrar
+                                        </a>
+                                        <a asp-action="Jugar" asp-route-id="@item.Id" class="btn btn-sm btn-success fw-bold">
+                                            🎮 JUGAR
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center p-5 text-muted">
+                                    No hay preguntas en el banco. Haz clic en "+ Nueva Pregunta".
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-center">
+        <p class="text-muted small mb-2 text-uppercase fw-bold">Modo de Juego Rápido</p>
+        <a asp-action="SiguienteAleatoria" class="btn btn-lg btn-warning fw-bold shadow px-5">
+            🎲 Lanzar Pregunta al Azar
+        </a>
+    </div>
+</div>
+
+<script>
+    // Funciones para manejar el modal "Custom"
+    function abrirModal() {
+        document.getElementById("modal-juego").style.display = "flex";
+    }
+
+    function cerrarModal() {
+        document.getElementById("modal-juego").style.display = "none";
+    }
+
+    function ejecutarLogout() {
+        window.location.href = '@Url.Action("Logout", "Acceso")';
+    }
+
+    // Cerrar modal si se hace clic fuera de la caja
+    window.onclick = function(event) {
+        var modal = document.getElementById("modal-juego");
+        if (event.target == modal) {
+            cerrarModal();
+        }
+    }
+</script>
