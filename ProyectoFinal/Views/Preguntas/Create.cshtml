@@ -9,7 +9,7 @@
         <div class="col-md-8 offset-md-2">
             <div class="card shadow">
                 <div class="card-header bg-primary text-white">
-                    <h3>Alta de Pregunta - 100 Mexicanos Dijeron</h3>
+                    <h3>Alta de Pregunta - 100 Cimarrones Dijeron</h3>
                 </div>
                 <div class="card-body">
                     <form asp-action="Create" method="post">
@@ -21,11 +21,16 @@
                         </div>
 
                         <hr />
-                        <h5 class="mb-3 text-secondary">Respuestas Populares y Puntos</h5>
+                        <h5 class="mb-2 text-secondary">Respuestas Populares y Puntos</h5>
+
+                        <div class="alert alert-info py-2 mb-3" role="alert" style="font-size: 0.9rem;">
+                            💡 <strong>Tip Pro:</strong> Puedes escribir sinónimos separados por comas. El juego aceptará cualquiera, pero en pantalla solo mostrará la primera palabra.<br />
+                            <em>Ejemplo: Automóvil, Carro, Coche, Auto</em>
+                        </div>
 
                         <div class="row mb-2">
                             <div class="col-8">
-                                <input asp-for="Respuesta1" class="form-control" placeholder="Respuesta #1 (La más popular)" />
+                                <input asp-for="Respuesta1" class="form-control" placeholder="Respuesta #1 (Ej: Automóvil, Carro, Coche)" />
                             </div>
                             <div class="col-4">
                                 <input asp-for="Puntos1" class="form-control" placeholder="Puntos" type="number" />
@@ -34,7 +39,7 @@
 
                         <div class="row mb-2">
                             <div class="col-8">
-                                <input asp-for="Respuesta2" class="form-control" placeholder="Respuesta #2" />
+                                <input asp-for="Respuesta2" class="form-control" placeholder="Respuesta #2 (Ej: Celular, Teléfono, Móvil)" />
                             </div>
                             <div class="col-4">
                                 <input asp-for="Puntos2" class="form-control" placeholder="Puntos" type="number" />
@@ -43,7 +48,7 @@
 
                         <div class="row mb-2">
                             <div class="col-8">
-                                <input asp-for="Respuesta3" class="form-control" placeholder="Respuesta #3" />
+                                <input asp-for="Respuesta3" class="form-control" placeholder="Respuesta #3 (Ej: Perro, Canino, Lomito)" />
                             </div>
                             <div class="col-4">
                                 <input asp-for="Puntos3" class="form-control" placeholder="Puntos" type="number" />
@@ -52,7 +57,7 @@
 
                         <div class="row mb-2">
                             <div class="col-8">
-                                <input asp-for="Respuesta4" class="form-control" placeholder="Respuesta #4" />
+                                <input asp-for="Respuesta4" class="form-control" placeholder="Respuesta #4, Sinónimos..." />
                             </div>
                             <div class="col-4">
                                 <input asp-for="Puntos4" class="form-control" placeholder="Puntos" type="number" />
@@ -61,7 +66,7 @@
 
                         <div class="row mb-2">
                             <div class="col-8">
-                                <input asp-for="Respuesta5" class="form-control" placeholder="Respuesta #5" />
+                                <input asp-for="Respuesta5" class="form-control" placeholder="Respuesta #5, Sinónimos..." />
                             </div>
                             <div class="col-4">
                                 <input asp-for="Puntos5" class="form-control" placeholder="Puntos" type="number" />

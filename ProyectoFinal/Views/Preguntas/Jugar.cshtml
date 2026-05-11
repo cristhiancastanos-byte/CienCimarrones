@@ -2,633 +2,818 @@
 @using Microsoft.AspNetCore.Http
 
 @{
-    ViewData["Title"] = "En Vivo - 100 Cimarrones Dijeron";
-    // Detectamos el rol desde la sesión
+    Layout = null;
     var rol = Context.Session.GetString("Rol");
 }
 
-<style>
-    body {
-        background-color: #ffffff;
-        color: #333333;
-        overflow-x: hidden;
-        font-family: 'Arial', sans-serif;
-    }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>En Vivo - 100 Cimarrones Dijeron</title>
 
-    .header-controles {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 80px;
-        margin-bottom: 1rem;
-        padding: 0 15px;
-    }
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
-    .btn-volver-container {
-        position: absolute;
-        left: 0;
-    }
-
-    .tablero {
-        background-color: #f8f9fa;
-        border: 5px solid #00723F;
-        border-radius: 15px;
-        padding: 15px;
-        position: relative;
-        z-index: 10;
-        box-shadow: 0 10px 30px rgba(0, 114, 63, 0.15);
-    }
-
-    .pregunta-box {
-        background-color: #00723F;
-        color: #ffffff;
-        border: 3px solid #FEBE10;
-        border-radius: 10px;
-        padding: 10px;
-        text-align: center;
-        margin-bottom: 15px;
-        min-height: 80px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-    }
-
-    .respuesta-card {
-        background-color: #ffffff;
-        border: 2px solid #20419A;
-        border-radius: 5px;
-        margin-bottom: 8px;
-        height: 45px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        overflow: hidden;
-        cursor: pointer;
-        transition: transform 0.1s, box-shadow 0.2s;
-    }
-
-    .respuesta-texto {
-        display: none;
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        padding: 0 15px;
-        font-weight: bold;
-        font-size: 1.2rem;
-        color: #024731;
-        height: 100%;
-        align-items: center;
-    }
-
-    .tapa {
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(to bottom, #FEBE10, #DD971A);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: 'Arial Black', sans-serif;
-        font-size: 1.5rem;
-        color: #024731;
-        border: 1px solid #B08208;
-        position: absolute;
-        top: 0;
-        left: 0;
-    }
-
-    .revelada .tapa {
-        display: none;
-    }
-
-    .revelada .respuesta-texto {
-        display: flex;
-    }
-
-    .revelada {
-        pointer-events: none;
-        border-color: #00723F;
-    }
-
-    .panel-equipo {
-        border: 3px solid #20419A;
-        border-radius: 15px;
-        padding: 20px;
-        text-align: center;
-        transition: all 0.3s;
-        opacity: 0.6;
-        cursor: pointer;
-        background-color: #ffffff;
-    }
-
-    .equipo-activo {
-        border-color: #00723F;
-        background-color: #f0fdf4;
-        opacity: 1;
-        transform: scale(1.02);
-    }
-
-    .ganador-ronda {
-        border-color: #FEBE10 !important;
-        background-color: #fffcf0;
-        transform: scale(1.1);
-        opacity: 1;
-    }
-
-    .marcador-puntos {
-        font-size: 4rem;
-        font-weight: bold;
-        color: #00723F;
-        text-shadow: 2px 2px 0px #FEBE10;
-    }
-
-    .zona-errores {
-        font-size: 3rem;
-        color: #dc3545;
-        min-height: 60px;
-        letter-spacing: 10px;
-    }
-
-    .timer-container {
-        position: relative;
-        width: 80px;
-        height: 80px;
-        margin: 0 auto 10px;
-    }
-
-    .timer-svg {
-        transform: rotate(-90deg);
-        width: 80px;
-        height: 80px;
-    }
-
-    .timer-circle-bg {
-        fill: none;
-        stroke: #eee;
-        stroke-width: 8;
-    }
-
-    .timer-circle-prog {
-        fill: none;
-        stroke: #00723F;
-        stroke-width: 8;
-        stroke-dasharray: 226;
-        stroke-dashoffset: 0;
-        transition: stroke-dashoffset 1s linear, stroke 0.3s;
-    }
-
-    .timer-text {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #333;
-    }
-
-    #overlay-error {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255,255,255,0.85);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 9998;
-    }
-
-    .x-gigante {
-        font-size: 25rem;
-        color: #dc3545;
-        font-family: 'Arial Black', sans-serif;
-        animation: vibrar 0.3s infinite;
-    }
-
-    @@keyframes vibrar {
-        0% {
-            transform: rotate(0deg);
+    <style>
+        body {
+            background-color: #f3f4f6;
+            color: #111827;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        25% {
-            transform: rotate(5deg);
+        .navbar-top {
+            background-color: #00723F;
+            height: 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        75% {
-            transform: rotate(-5deg);
+        .navbar-titulo {
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin: 0;
         }
 
-        100% {
-            transform: rotate(0deg);
+        .navbar-controles {
+            display: flex;
+            gap: 12px;
+            align-items: center;
         }
-    }
 
-    @@keyframes blink {
-        0% {
+        .btn-nav {
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            border: none;
+            transition: opacity 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+            .btn-nav:hover {
+                opacity: 0.8;
+            }
+
+        .btn-blanco {
+            background-color: #ffffff;
+            color: #00723F;
+        }
+
+        .btn-rojo {
+            background-color: #ef4444;
+            color: #ffffff;
+        }
+
+        .btn-amarillo {
+            background-color: #FEBE10;
+            color: #111827;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.8);
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: color 0.2s;
+            padding: 0 5px;
+        }
+
+            .btn-icon:hover {
+                color: #FEBE10;
+            }
+
+        .separador-nav {
+            width: 1px;
+            height: 24px;
+            background-color: rgba(255,255,255,0.2);
+            margin: 0 10px;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .panel-equipo {
+            background-color: #ffffff;
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            opacity: 0.6;
+        }
+
+        .equipo-activo {
+            border-color: #00723F;
+            opacity: 1;
+            box-shadow: 0 10px 15px -3px rgba(0,114,63,0.1);
+            transform: translateY(-5px);
+        }
+
+        .ganador-ronda {
+            border-color: #FEBE10;
+            background-color: #fffbeb;
             opacity: 1;
         }
 
-        50% {
-            opacity: 0.4;
+        .eq-titulo {
+            font-size: 1.2rem;
+            color: #6b7280;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
         }
 
-        100% {
-            opacity: 1;
+        .eq-puntos {
+            font-size: 5rem;
+            font-weight: 900;
+            color: #00723F;
+            line-height: 1;
         }
-    }
 
-    #modal-juego {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-    }
+        .zona-errores {
+            font-size: 2.5rem;
+            color: #ef4444;
+            min-height: 50px;
+            margin-top: 15px;
+            letter-spacing: 8px;
+        }
 
-    .caja-mensaje {
-        background: #ffffff;
-        border: 5px solid #00723F;
-        border-radius: 15px;
-        padding: 30px;
-        text-align: center;
-        max-width: 600px;
-        width: 90%;
-    }
+        .tablero-container {
+            padding: 0 30px;
+        }
 
-    .btn-modal {
-        padding: 10px 30px;
-        font-size: 1.2rem;
-        border-radius: 10px;
-        border: none;
-        font-weight: bold;
-        margin: 0 10px;
-        cursor: pointer;
-    }
+        .pregunta-box {
+            background-color: #00723F;
+            color: #ffffff;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
 
-    .btn-ok {
-        background-color: #00723F;
-        color: white;
-    }
+        .pregunta-texto {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin: 0;
+            line-height: 1.2;
+        }
 
-    .btn-cancel {
-        background-color: #dc3545;
-        color: white;
-    }
+        .dashboard-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
 
-    .btn-audio-toggle {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 1000;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: #00723F;
-        color: white;
-        border: 2px solid #FEBE10;
-        font-size: 1.5rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-</style>
+        .acumu-label {
+            font-size: 0.8rem;
+            color: #6b7280;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
 
-<audio id="snd-acierto" src="~/audio/acierto.mp3"></audio>
-<audio id="snd-error" src="~/audio/error.mp3"></audio>
-<audio id="snd-reloj" src="~/audio/reloj.mp3"></audio>
+        .acumu-puntos {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #111827;
+            line-height: 1;
+        }
 
-<button onclick="toggleMute()" class="btn-audio-toggle shadow" id="mute-btn">🔊</button>
+        .reloj-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
 
-<div id="overlay-error"><div class="x-gigante">❌</div></div>
+        .controles-reloj {
+            display: flex;
+            gap: 8px;
+        }
 
-<div id="modal-juego">
-    <div class="caja-mensaje">
-        <div id="modal-titulo" class="h2 fw-bold text-uppercase" style="color: #20419A;">ATENCIÓN</div>
-        <div id="modal-texto" class="fs-4 mb-4">...</div>
-        <div id="modal-botones"></div>
+        .btn-mini {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            background: #fff;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+            .btn-mini:hover {
+                background: #f3f4f6;
+            }
+
+        .timer-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 5px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 900;
+            color: #111827;
+            position: relative;
+        }
+
+        .respuesta-card {
+            background-color: #FEBE10;
+            border-radius: 8px;
+            height: 55px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .tapa {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #00723F;
+        }
+
+        .respuesta-texto {
+            display: none;
+            width: 100%;
+            justify-content: space-between;
+            padding: 0 25px;
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: #111827;
+            align-items: center;
+        }
+
+        .puntos-val {
+            background-color: #00723F;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+        }
+
+        .revelada {
+            background-color: #ffffff;
+            border: 2px solid #e5e7eb;
+            pointer-events: none;
+        }
+
+            .revelada .tapa {
+                display: none;
+            }
+
+            .revelada .respuesta-texto {
+                display: flex;
+            }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .input-limpio {
+            flex: 1;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .input-limpio:focus {
+                border-color: #00723F;
+            }
+
+        .btn-accion {
+            padding: 0 25px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: white;
+            transition: opacity 0.2s;
+        }
+
+        .btn-verde {
+            background-color: #00723F;
+        }
+
+        .btn-rojo-error {
+            background-color: #ef4444;
+        }
+
+        .btn-accion:hover {
+            opacity: 0.9;
+        }
+
+        .btn-siguiente-grande {
+            background-color: #FEBE10;
+            color: #111827;
+            width: 100%;
+            font-size: 1.3rem;
+            padding: 15px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: none;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+            .btn-siguiente-grande:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            }
+
+        .modal-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(17,24,39,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-panel {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .modal-titulo {
+            font-weight: 900;
+            color: #111827;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .modal-texto {
+            color: #4b5563;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        .btn-modal {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+
+        .btn-m-ok {
+            background: #00723F;
+            color: white;
+        }
+
+        .btn-m-cancel {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        #overlay-error {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(239, 68, 68, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9998;
+        }
+
+        .x-gigante {
+            font-size: 20rem;
+            color: white;
+            font-weight: 900;
+        }
+
+        .btn-audio {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="snd-acierto" src="~/audio/acierto.mp3"></audio>
+    <audio id="snd-error" src="~/audio/error.mp3"></audio>
+    <audio id="snd-reloj" src="~/audio/reloj.mp3"></audio>
+
+    <button onclick="toggleMute()" class="btn-audio" id="mute-btn">🔊</button>
+    <div id="overlay-error"><div class="x-gigante">X</div></div>
+
+    <div id="modal-info" class="modal-bg">
+        <div class="modal-panel" style="max-width: 600px;">
+            <h2 class="modal-titulo">Manual de Operación</h2>
+            <div class="modal-texto">
+                <p><strong>1. Sinónimos:</strong> Puedes escribir variantes si las registraste en la pregunta.</p>
+                <p><strong>2. Errores Ortográficos:</strong> El sistema perdona pequeños errores de escritura automáticamente.</p>
+                <p><strong>3. Modo Juez:</strong> Si alguien da una respuesta válida que no está en el código, simplemente haz clic en el número de la tarjeta para revelarla manualmente.</p>
+            </div>
+            <button class="btn-modal btn-m-ok w-100" onclick="cerrarModalInfo()">Cerrar</button>
+        </div>
     </div>
-</div>
 
-<div class="container-fluid mt-3">
-    <div class="header-controles">
-        <div class="btn-volver-container">
-            @* Lógica de Botones Inteligente *@
+    <div id="modal-config" class="modal-bg">
+        <div class="modal-panel">
+            <h3 class="modal-titulo">Temporizador</h3>
+            <p class="modal-texto text-center">Segundos por turno:</p>
+            <input type="number" id="input-tiempo" class="form-control form-control-lg text-center fw-bold mb-4" value="20" min="5" max="99">
+            <div>
+                <button class="btn-modal btn-m-cancel" onclick="cerrarModalConfig()">Cancelar</button>
+                <button class="btn-modal btn-m-ok" onclick="guardarConfig()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-juego" class="modal-bg">
+        <div class="modal-panel">
+            <h3 id="modal-titulo" class="modal-titulo">Atención</h3>
+            <p id="modal-texto" class="modal-texto text-center">...</p>
+            <div id="modal-botones"></div>
+        </div>
+    </div>
+
+    <nav class="navbar-top">
+        <h1 class="navbar-titulo">100 CIMARRONES DIJERON</h1>
+        <div class="navbar-controles">
             @if (rol == "Admin")
             {
-                <button onclick="confirmarSalida()" class="btn fw-bold shadow-sm"
-                        style="background-color: #00723F; color: white; border-radius: 8px; border: 2px solid #024731; padding: 10px 25px;">
-                    ⬅ Volver al Menú
-                </button>
+                <button onclick="window.location.href='@Url.Action("Index", "Preguntas")'" class="btn-nav btn-blanco">Menú Principal</button>
             }
             else
             {
-                <button onclick="confirmarLogout()" class="btn btn-danger fw-bold shadow-sm"
-                        style="border-radius: 8px; border: 2px solid #a71d2a; padding: 10px 25px;">
-                    🚪 Cerrar Sesión
-                </button>
+                <button onclick="window.location.href='@Url.Action("Logout", "Acceso")'" class="btn-nav btn-blanco">Cerrar Sesión</button>
             }
-        </div>
+            <button onclick="confirmarNuevoJuego()" class="btn-nav btn-rojo">Reiniciar Puntos</button>
+            <a href="@Url.Action("SiguienteAleatoria", "Preguntas")" class="btn-nav btn-amarillo">Siguiente ➡</a>
 
-        <div class="d-flex gap-3">
-            <button onclick="confirmarNuevoJuego()" class="btn btn-danger fw-bold shadow-sm" style="border-radius: 8px; padding: 10px 20px;">
-                ⚠️ Reiniciar Marcadores
-            </button>
-            <a asp-controller="Preguntas" asp-action="SiguienteAleatoria" class="btn fw-bold shadow-sm"
-               style="background-color: #FEBE10; color: #024731; border-radius: 8px; border: 2px solid #B08208; padding: 10px 25px; text-decoration: none;">
-                🔄 Siguiente Pregunta ➡
-            </a>
+            <div class="separador-nav"></div>
+            <button class="btn-icon" title="Reglas" onclick="abrirModalInfo()">ℹ️</button>
+            <button class="btn-icon" title="Ajustes" onclick="abrirModalConfig()">⚙️</button>
         </div>
-    </div>
+    </nav>
 
-    <div class="row align-items-center">
-        <div class="col-md-3 text-center">
-            <div id="panel-eq1" class="panel-equipo equipo-activo" onclick="seleccionarEquipo(1)">
-                <h3 style="color: #20419A; font-weight: 900;">EQUIPO 1</h3>
-                <div class="marcador-puntos" id="puntos-eq1">0</div>
-                <div class="zona-errores" id="errores-eq1"></div>
-            </div>
-        </div>
+    <div class="main-content">
+        <div class="container-fluid">
+            <div class="row align-items-center">
 
-        <div class="col-md-6">
-            <div class="tablero">
-                <div class="timer-container">
-                    <svg class="timer-svg">
-                        <circle class="timer-circle-bg" cx="40" cy="40" r="36"></circle>
-                        <circle id="timer-prog" class="timer-circle-prog" cx="40" cy="40" r="36"></circle>
-                    </svg>
-                    <div id="timer-count" class="timer-text">15</div>
+                <div class="col-md-3">
+                    <div id="panel-eq1" class="panel-equipo equipo-activo" onclick="seleccionarEquipo(1)">
+                        <div class="eq-titulo">EQUIPO 1</div>
+                        <div class="eq-puntos" id="puntos-eq1">0</div>
+                        <div class="zona-errores" id="errores-eq1"></div>
+                    </div>
                 </div>
 
-                <div class="pregunta-box">
-                    <h3 class="text-uppercase m-0 fw-bold">@Model.Titulo</h3>
-                </div>
+                <div class="col-md-6 tablero-container">
+                    <div class="pregunta-box">
+                        <h2 class="pregunta-texto">@Model.Titulo</h2>
+                    </div>
 
-                <div class="text-center mb-3">
-                    <span class="badge p-2 fs-6 border border-dark" style="background-color: #20419A; color: white;">
-                        BOTE: <span id="bote-puntos" style="color: #FEBE10;" class="fw-bold fs-4">0</span>
-                    </span>
-                    <div id="aviso-robo" class="badge bg-danger p-2 fs-6 ms-2" style="display:none; animation: blink 1s infinite;">🚨 ROBO</div>
-                </div>
-
-                @for (int i = 1; i <= 5; i++)
-                {
-                    string respuesta = (string)Model.GetType().GetProperty($"Respuesta{i}").GetValue(Model, null);
-                    int? puntos = (int?)Model.GetType().GetProperty($"Puntos{i}").GetValue(Model, null);
-
-                    if (!string.IsNullOrEmpty(respuesta))
-                    {
-                        <div class="respuesta-card shadow-sm" id="card-@i" onclick="forzarRevelacion(@i)">
-                            <div class="tapa">@i</div>
-                            <div class="respuesta-texto">
-                                <span id="texto-@i">@respuesta</span>
-                                <span class="badge text-dark puntos-val" style="background-color: #FEBE10; border: 1px solid #000;">@puntos</span>
+                    <div class="dashboard-bar">
+                        <div>
+                            <div class="acumu-label">ACUMULADO</div>
+                            <div class="acumu-puntos" id="bote-puntos">0</div>
+                            <span id="aviso-robo" class="badge bg-danger mt-1" style="display:none;">MODO ROBO</span>
+                        </div>
+                        <div class="reloj-wrapper">
+                            <div class="controles-reloj">
+                                <button onclick="togglePausa()" id="btn-pausa" class="btn-mini">Iniciar</button>
+                                <button onclick="reiniciarRelojManual()" class="btn-mini">Reset</button>
+                            </div>
+                            <div class="timer-circle" id="timer-ui">
+                                <span id="timer-count">20</span>
                             </div>
                         </div>
-                    }
-                }
+                    </div>
 
-                <div class="input-group input-group-lg mt-4 shadow-sm">
-                    <input type="text" id="inputRespuesta" class="form-control text-center fw-bold" placeholder="Escribe la respuesta..." autocomplete="off" style="border: 2px solid #00723F;">
-                    <button class="btn fw-bold text-white px-4" type="button" onclick="verificarRespuesta()" style="background-color: #00723F;">¡DICE!</button>
-                    <button class="btn btn-danger fw-bold" type="button" onclick="manejarError()">❌</button>
+                    <div id="contenedor-respuestas">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            string? respuestaDB = Model.GetType().GetProperty($"Respuesta{i}")?.GetValue(Model, null) as string;
+                            int? puntos = Model.GetType().GetProperty($"Puntos{i}")?.GetValue(Model, null) as int?;
+
+                            if (!string.IsNullOrEmpty(respuestaDB))
+                            {
+                                // Tomamos solo la primera palabra antes de la coma para mostrar en pantalla
+                                string palabraPrincipal = respuestaDB.Split(',')[0].Trim();
+
+                                <div class="respuesta-card" id="card-@i" onclick="forzarRevelacion(@i)">
+                                    <div class="tapa">@i</div>
+                                    <div class="respuesta-texto">
+                                        <span id="texto-@i" data-sinonimos="@respuestaDB">@palabraPrincipal</span>
+                                        <span class="puntos-val">@puntos</span>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <div class="input-area" id="area-controles">
+                        <input type="text" id="inputRespuesta" class="input-limpio" placeholder="Escribe la respuesta..." autocomplete="off">
+                        <button id="btn-verificar" class="btn-accion btn-verde" onclick="verificarRespuesta()">VERIFICAR</button>
+                        <button id="btn-error" class="btn-accion btn-rojo-error" onclick="manejarError()">X</button>
+
+                        <button id="btn-siguiente-ronda" class="btn-siguiente-grande" onclick="window.location.href='@Url.Action("SiguienteAleatoria", "Preguntas")'">
+                            SIGUIENTE PREGUNTA ➡
+                        </button>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="col-md-3 text-center">
-            <div id="panel-eq2" class="panel-equipo" onclick="seleccionarEquipo(2)">
-                <h3 style="color: #20419A; font-weight: 900;">EQUIPO 2</h3>
-                <div class="marcador-puntos" id="puntos-eq2">0</div>
-                <div class="zona-errores" id="errores-eq2"></div>
+                <div class="col-md-3">
+                    <div id="panel-eq2" class="panel-equipo" onclick="seleccionarEquipo(2)">
+                        <div class="eq-titulo">EQUIPO 2</div>
+                        <div class="eq-puntos" id="puntos-eq2">0</div>
+                        <div class="zona-errores" id="errores-eq2"></div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    var equipoActual = 1; var equipoOriginal = 1;
-    var botePuntos = 0; var erroresActuales = 0;
-    var modoRobo = false; var rondaTerminada = false;
-    var callbackActual = null;
-    var estaMuteado = false;
+    <script>
+        var equipoActual = 1; var equipoOriginal = 1;
+        var botePuntos = 0; var erroresActuales = 0;
+        var modoRobo = false; var rondaTerminada = false;
+        var estaMuteado = false;
+        var tiempoMax = 20; var tiempoRestante = tiempoMax;
+        var timerInterval = null; var relojPausado = true;
 
-    var tiempoMax = 15;
-    var tiempoRestante = tiempoMax;
-    var timerInterval = null;
+        function abrirModalInfo() { pausarReloj(); document.getElementById("modal-info").style.display = "flex"; }
+        function cerrarModalInfo() { document.getElementById("modal-info").style.display = "none"; reanudarReloj(); }
+        function abrirModalConfig() { pausarReloj(); document.getElementById("input-tiempo").value = tiempoMax; document.getElementById("modal-config").style.display = "flex"; }
+        function cerrarModalConfig() { document.getElementById("modal-config").style.display = "none"; reanudarReloj(); }
 
-    function playSound(id) {
-        if (estaMuteado) return;
-        const sound = document.getElementById(id);
-        if (sound) { sound.currentTime = 0; sound.play().catch(e => {}); }
-    }
-
-    function toggleMute() {
-        estaMuteado = !estaMuteado;
-        document.getElementById("mute-btn").innerText = estaMuteado ? "🔇" : "🔊";
-    }
-
-    function startTimer(reset = false) {
-        clearInterval(timerInterval);
-        if (reset) {
-            tiempoRestante = tiempoMax;
-            const audioReloj = document.getElementById("snd-reloj");
-            if(audioReloj) { audioReloj.pause(); audioReloj.currentTime = 0; }
+        function guardarConfig() {
+            let nuevoTiempo = parseInt(document.getElementById("input-tiempo").value);
+            if (nuevoTiempo >= 5) { tiempoMax = nuevoTiempo; cerrarModalConfig(); reiniciarRelojManual(); }
         }
 
-        actualizarUIClock();
+        function reanudarReloj() {
+            if(!rondaTerminada && !relojPausado) startTimer(false);
+            if(!rondaTerminada) document.getElementById("inputRespuesta").focus();
+        }
 
-        timerInterval = setInterval(() => {
-            if (rondaTerminada) { clearInterval(timerInterval); return; }
-
-            if (tiempoRestante === 5) {
-                playSound("snd-reloj");
-            }
-
-            tiempoRestante--;
-            actualizarUIClock();
-
-            if (tiempoRestante <= 0) {
-                clearInterval(timerInterval);
-                manejarError();
-            }
-        }, 1000);
-    }
-
-    function pausarReloj() {
-        clearInterval(timerInterval);
-        const audioReloj = document.getElementById("snd-reloj");
-        if(audioReloj) audioReloj.pause();
-    }
-
-    function actualizarUIClock() {
-        const textElem = document.getElementById("timer-count");
-        const circleElem = document.getElementById("timer-prog");
-        textElem.innerText = tiempoRestante;
-        const offset = 226 - (tiempoRestante * 226) / tiempoMax;
-        circleElem.style.strokeDashoffset = offset;
-
-        if (tiempoRestante > 7) circleElem.style.stroke = "#00723F";
-        else if (tiempoRestante > 3) circleElem.style.stroke = "#FEBE10";
-        else circleElem.style.stroke = "#dc3545";
-    }
-
-    function mostrarMensaje(titulo, texto, callback) {
-        pausarReloj();
-        document.getElementById("modal-titulo").innerText = titulo;
-        document.getElementById("modal-texto").innerHTML = texto.replace(/\n/g, "<br>");
-        document.getElementById("modal-botones").innerHTML = '<button class="btn-modal btn-ok" onclick="cerrarModal()">ENTENDIDO</button>';
-        callbackActual = callback;
-        document.getElementById("modal-juego").style.display = "flex";
-    }
-
-    function cerrarModal() {
-        document.getElementById("modal-juego").style.display = "none";
-        if (callbackActual) { callbackActual(); callbackActual = null; }
-        if (!rondaTerminada) startTimer(false);
-        document.getElementById("inputRespuesta").focus();
-    }
-
-    function mostrarConfirmacion(titulo, texto, callbackSi) {
-        pausarReloj();
-        document.getElementById("modal-titulo").innerText = titulo;
-        document.getElementById("modal-texto").innerText = texto;
-        document.getElementById("modal-botones").innerHTML = `
-            <button class="btn-modal btn-cancel" onclick="document.getElementById('modal-juego').style.display='none'; if(!rondaTerminada) startTimer(false);">CANCELAR</button>
-            <button class="btn-modal btn-ok" id="btn-confirmar">CONFIRMAR</button>
-        `;
-        document.getElementById("btn-confirmar").onclick = function() {
+        function mostrarMensaje(titulo, texto, callback) {
+            pausarReloj();
+            document.getElementById("modal-titulo").innerText = titulo;
+            document.getElementById("modal-texto").innerHTML = texto;
+            document.getElementById("modal-botones").innerHTML = '<button class="btn-modal btn-m-ok" onclick="cerrarAlerta()">Aceptar</button>';
+            window.callbackActual = callback;
+            document.getElementById("modal-juego").style.display = "flex";
+        }
+        function cerrarAlerta() {
             document.getElementById("modal-juego").style.display = "none";
-            callbackSi();
+            if(window.callbackActual) window.callbackActual();
+            reanudarReloj();
+        }
+
+        function confirmarNuevoJuego() {
+            pausarReloj();
+            document.getElementById("modal-titulo").innerText = "Reiniciar Puntos";
+            document.getElementById("modal-texto").innerText = "¿Borrar los puntos de ambos equipos?";
+            document.getElementById("modal-botones").innerHTML = `
+                <button class="btn-modal btn-m-cancel" onclick="document.getElementById('modal-juego').style.display='none'; reanudarReloj();">Cancelar</button>
+                <button class="btn-modal btn-m-ok" onclick="localStorage.clear(); location.reload();">Confirmar</button>
+            `;
+            document.getElementById("modal-juego").style.display = "flex";
+        }
+
+        function playSound(id) { if(!estaMuteado) { let s = document.getElementById(id); if(s){s.currentTime=0; s.play().catch(e=>{});} } }
+        function toggleMute() { estaMuteado = !estaMuteado; document.getElementById("mute-btn").innerText = estaMuteado ? "🔇" : "🔊"; }
+
+        function startTimer(reset = false) {
+            clearInterval(timerInterval);
+            if (reset) { tiempoRestante = tiempoMax; relojPausado = false; document.getElementById("btn-pausa").innerText = "Pausar"; }
+            actualizarUIClock();
+            timerInterval = setInterval(() => {
+                if(rondaTerminada || relojPausado) return;
+                if(tiempoRestante === 5) playSound("snd-reloj");
+                tiempoRestante--;
+                actualizarUIClock();
+                if(tiempoRestante <= 0) { clearInterval(timerInterval); manejarError(); }
+            }, 1000);
+        }
+        function pausarReloj() { clearInterval(timerInterval); let a = document.getElementById("snd-reloj"); if(a) a.pause(); }
+        function togglePausa() {
+            if(rondaTerminada) return;
+            relojPausado = !relojPausado;
+            let btn = document.getElementById("btn-pausa");
+            btn.innerText = relojPausado ? "Reanudar" : "Pausar";
+            if(!relojPausado) startTimer(false); else pausarReloj();
+        }
+        function reiniciarRelojManual() {
+            pausarReloj(); tiempoRestante = tiempoMax; relojPausado = true;
+            document.getElementById("btn-pausa").innerText = "Iniciar";
+            actualizarUIClock();
+        }
+        function actualizarUIClock() {
+            document.getElementById("timer-count").innerText = tiempoRestante;
+            let circ = document.getElementById("timer-ui");
+            if(tiempoRestante > 5) circ.style.borderColor = "#e5e7eb"; else circ.style.borderColor = "#ef4444";
+        }
+
+        window.onload = function() {
+            if(localStorage.getItem("puntosEq1")) document.getElementById("puntos-eq1").innerText = localStorage.getItem("puntosEq1");
+            if(localStorage.getItem("puntosEq2")) document.getElementById("puntos-eq2").innerText = localStorage.getItem("puntosEq2");
+            document.getElementById("inputRespuesta").focus();
+            reiniciarRelojManual();
         };
-        document.getElementById("modal-juego").style.display = "flex";
-    }
 
-    function confirmarSalida() {
-        mostrarConfirmacion("SALIR DEL JUEGO", "¿Seguro que quieres volver al panel de control?", function() {
-            window.location.href = '@Url.Action("Index", "Preguntas")';
-        });
-    }
+        function seleccionarEquipo(num) {
+            if(modoRobo || rondaTerminada) return;
+            equipoActual = num; equipoOriginal = num; erroresActuales = 0;
+            document.getElementById("panel-eq1").classList.toggle("equipo-activo", num===1);
+            document.getElementById("panel-eq2").classList.toggle("equipo-activo", num===2);
+            reiniciarRelojManual();
+        }
 
-    function confirmarLogout() {
-        mostrarConfirmacion("CERRAR SESIÓN", "¿Estás seguro que quieres salir al inicio?", function() {
-            window.location.href = '@Url.Action("Logout", "Acceso")';
-        });
-    }
+        // --- ALGORITMOS DE BÚSQUEDA Y SIMILITUD ---
+        function normalizar(t) { return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim(); }
 
-    function confirmarNuevoJuego() {
-        mostrarConfirmacion("REINICIAR MARCADORES", "¿Borrar puntos de ambos equipos?", function() {
-            localStorage.clear(); location.reload();
-        });
-    }
+        function calcularSimilitud(s1, s2) {
+            let longer = s1; let shorter = s2;
+            if (s1.length < s2.length) { longer = s2; shorter = s1; }
+            let longerLength = longer.length;
+            if (longerLength == 0) return 1.0;
 
-    window.onload = function() {
-        if(localStorage.getItem("puntosEq1")) document.getElementById("puntos-eq1").innerText = localStorage.getItem("puntosEq1");
-        if(localStorage.getItem("puntosEq2")) document.getElementById("puntos-eq2").innerText = localStorage.getItem("puntosEq2");
-        document.getElementById("inputRespuesta").focus();
-        startTimer(true);
-    };
+            let costs = new Array();
+            for (let i = 0; i <= longer.length; i++) {
+                let lastValue = i;
+                for (let j = 0; j <= shorter.length; j++) {
+                    if (i == 0) costs[j] = j;
+                    else {
+                        if (j > 0) {
+                            let newValue = costs[j - 1];
+                            if (longer.charAt(i - 1) != shorter.charAt(j - 1))
+                                newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                            costs[j - 1] = lastValue; lastValue = newValue;
+                        }
+                    }
+                }
+                if (i > 0) costs[shorter.length] = lastValue;
+            }
+            return (longerLength - costs[shorter.length]) / parseFloat(longerLength);
+        }
 
-    function seleccionarEquipo(num) {
-        if (modoRobo || rondaTerminada) return;
-        equipoActual = num; equipoOriginal = num; erroresActuales = 0;
-        actualizarEstilosEquipos();
-        startTimer(true);
-    }
+        function verificarRespuesta() {
+            if(rondaTerminada) return;
+            let input = document.getElementById("inputRespuesta");
+            let intento = normalizar(input.value);
+            if(intento === "") return;
 
-    function actualizarEstilosEquipos() {
-        document.getElementById("panel-eq1").className = "panel-equipo" + (equipoActual==1?" equipo-activo":"");
-        document.getElementById("panel-eq2").className = "panel-equipo" + (equipoActual==2?" equipo-activo":"");
-    }
+            let encontro = false;
 
-    function normalizar(texto) {
-        return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-    }
+            for(let i=1; i<=5; i++) {
+                let card = document.getElementById("card-"+i);
 
-    function verificarRespuesta() {
-        if (rondaTerminada) return;
-        var input = document.getElementById("inputRespuesta");
-        var intento = normalizar(input.value);
-        if (intento === "") return;
-        var encontro = false;
-        for (var i = 1; i <= 5; i++) {
-            var card = document.getElementById("card-" + i);
-            if (card && !card.classList.contains("revelada")) {
-                var textoReal = normalizar(document.getElementById("texto-" + i).innerText);
-                if (textoReal === intento || (textoReal.includes(intento) && intento.length > 3)) {
-                    ejecutarAcierto(card); encontro = true;
+                if(card && !card.classList.contains("revelada")) {
+                    let spanTexto = document.getElementById("texto-"+i);
+                    let sinonimosRaw = spanTexto.getAttribute("data-sinonimos");
+                    let listaSinonimos = sinonimosRaw.split(','); // Divide la cadena por comas
+
+                    // Revisa el intento contra cada sinónimo de la lista
+                    for(let j=0; j < listaSinonimos.length; j++) {
+                        let palabraValida = normalizar(listaSinonimos[j]);
+                        let similitud = calcularSimilitud(palabraValida, intento);
+
+                        // Validamos si es exacta, si está contenida, o si tiene error de dedo menor al 25%
+                        if(palabraValida === intento || (palabraValida.includes(intento) && intento.length > 3) || similitud >= 0.75) {
+                            ejecutarAcierto(card);
+                            encontro = true;
+                            break; // Rompe el ciclo interno
+                        }
+                    }
+                    if(encontro) break; // Si ya acertó, no revisa más tarjetas
                 }
             }
+
+            if(!encontro) manejarError();
+            input.value = "";
         }
-        if (!encontro) manejarError();
-        input.value = "";
-    }
 
-    function forzarRevelacion(indice) {
-        if (rondaTerminada) return;
-        var card = document.getElementById("card-" + indice);
-        if (card && !card.classList.contains("revelada")) ejecutarAcierto(card);
-    }
+        // -------------------------------------------
 
-    function ejecutarAcierto(card) {
-        card.classList.add("revelada");
-        playSound("snd-acierto");
-        var pts = parseInt(card.querySelector(".puntos-val").innerText);
-        botePuntos += pts;
-        document.getElementById("bote-puntos").innerText = botePuntos;
+        function forzarRevelacion(idx) {
+            if(rondaTerminada) return;
+            let card = document.getElementById("card-"+idx);
+            if(card && !card.classList.contains("revelada")) ejecutarAcierto(card);
+        }
 
-        if (modoRobo) finalizarRonda(equipoActual);
-        else if (document.querySelectorAll(".respuesta-card:not(.revelada)").length === 0) finalizarRonda(equipoActual);
-        else startTimer(true);
-    }
+        function ejecutarAcierto(card) {
+            card.classList.add("revelada"); playSound("snd-acierto");
+            botePuntos += parseInt(card.querySelector(".puntos-val").innerText);
+            document.getElementById("bote-puntos").innerText = botePuntos;
 
-    function manejarError() {
-        pausarReloj();
-        playSound("snd-error");
-        var overlay = document.getElementById("overlay-error");
-        overlay.style.display = "flex";
-        setTimeout(function() { overlay.style.display = "none"; postError(); }, 1200);
-    }
+            if(modoRobo || document.querySelectorAll(".respuesta-card:not(.revelada)").length === 0) finalizarRonda(equipoActual);
+            else startTimer(true);
+        }
 
-    function postError() {
-        if (modoRobo) {
-            mostrarMensaje("¡ROBO FALLIDO!", "Puntos para el equipo original.", function() { finalizarRonda(equipoOriginal); });
-        } else {
-            erroresActuales++;
-            document.getElementById("errores-eq" + equipoActual).innerHTML += "❌ ";
-            if (erroresActuales >= 3) {
-                mostrarMensaje("¡TRES TACHAS!", "Turno de robo.", function() {
-                    modoRobo = true;
-                    document.getElementById("aviso-robo").style.display = "inline-block";
-                    equipoActual = (equipoActual === 1) ? 2 : 1;
-                    actualizarEstilosEquipos();
-                    startTimer(true);
-                });
+        function manejarError() {
+            pausarReloj(); playSound("snd-error");
+            let ov = document.getElementById("overlay-error");
+            ov.style.display = "flex";
+            setTimeout(() => { ov.style.display = "none"; postError(); }, 1200);
+        }
+
+        function postError() {
+            if(modoRobo) {
+                mostrarMensaje("Robo Fallido", "Los puntos se quedan con el equipo original.", () => finalizarRonda(equipoOriginal));
             } else {
-                startTimer(true);
+                erroresActuales++;
+                document.getElementById("errores-eq"+equipoActual).innerText += "X ";
+                if(erroresActuales >= 3) {
+                    mostrarMensaje("¡Tres Errores!", "Oportunidad de robo para el equipo contrario.", () => {
+                        modoRobo = true; document.getElementById("aviso-robo").style.display = "inline-block";
+                        equipoActual = equipoActual === 1 ? 2 : 1;
+                        document.getElementById("panel-eq1").classList.toggle("equipo-activo", equipoActual===1);
+                        document.getElementById("panel-eq2").classList.toggle("equipo-activo", equipoActual===2);
+                        startTimer(true);
+                    });
+                } else { startTimer(true); }
             }
         }
-    }
 
-    function finalizarRonda(ganador) {
-        rondaTerminada = true;
-        pausarReloj();
-        var total = parseInt(localStorage.getItem("puntosEq" + ganador) || 0) + botePuntos;
-        localStorage.setItem("puntosEq" + ganador, total);
-        document.getElementById("puntos-eq" + ganador).innerText = total;
-        document.getElementById("panel-eq" + ganador).classList.add("ganador-ronda");
-        document.querySelectorAll(".respuesta-card").forEach(c => c.classList.add("revelada"));
-        mostrarMensaje("FIN DE LA RONDA", "Puntos sumados al equipo " + ganador);
-    }
+        function finalizarRonda(ganador) {
+            rondaTerminada = true; pausarReloj();
+            let total = parseInt(localStorage.getItem("puntosEq"+ganador) || 0) + botePuntos;
+            localStorage.setItem("puntosEq"+ganador, total);
+            document.getElementById("puntos-eq"+ganador).innerText = total;
+            document.getElementById("panel-eq"+ganador).classList.add("ganador-ronda");
+            document.querySelectorAll(".respuesta-card").forEach(c => c.classList.add("revelada"));
 
-    document.getElementById("inputRespuesta").addEventListener("keypress", function(e) { if (e.key === "Enter") verificarRespuesta(); });
-</script>
+            document.getElementById("inputRespuesta").style.display = "none";
+            document.getElementById("btn-verificar").style.display = "none";
+            document.getElementById("btn-error").style.display = "none";
+            document.getElementById("btn-siguiente-ronda").style.display = "block";
+
+            mostrarMensaje("Fin de la Ronda", "Puntos transferidos al Equipo " + ganador);
+        }
+
+        document.getElementById("inputRespuesta").addEventListener("keypress", e => { if(e.key === "Enter") verificarRespuesta(); });
+    </script>
+</body>
+</html>
